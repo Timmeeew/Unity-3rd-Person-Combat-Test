@@ -12,10 +12,10 @@ public class SwordCollision : MonoBehaviour
     {
         if (other.gameObject.tag == "enemy")
         {
-            Debug.Log("Enter");
-            Rigidbody enemyBody = other.GetComponent<Rigidbody>();
-            Vector3 newVector3 = other.transform.position - PlayerObj.transform.position;
-            enemyBody.AddForce(newVector3 * knockbackAmount, ForceMode.Impulse);
+            Debug.Log("Collider Hit!");
+            Rigidbody enemyBody = other.GetComponent<Rigidbody>(); //Gets the enemy's rigidbody
+            Vector3 newVector3 = other.transform.position - PlayerObj.transform.position; //Calculate the vector3 dir for knockback effect
+            enemyBody.AddForce(newVector3 * knockbackAmount, ForceMode.Impulse); //Apply a force for the enemy's rigidbody to that dir
         }
     }
 

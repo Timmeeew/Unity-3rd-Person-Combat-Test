@@ -2305,6 +2305,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 8eee626a-7895-4d7c-8a6c-ae31a3458930
     m_ActionName: PlayerMovement/SwitchCameraMode[/Keyboard/z]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1533863073}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: RollAction
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b847ba12-4fc3-4d4c-bfbf-b30f7f400a97
+    m_ActionName: PlayerMovement/Roll[/Keyboard/v]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: PlayerMovement

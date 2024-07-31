@@ -107,6 +107,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Roll"",
+                    ""type"": ""Button"",
+                    ""id"": ""b847ba12-4fc3-4d4c-bfbf-b30f7f400a97"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -384,6 +393,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""SwitchCameraMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bb36f8e6-a080-4654-b043-1a1601fb9dae"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Roll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -401,6 +421,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_PlayerMovement_Slash = m_PlayerMovement.FindAction("Slash", throwIfNotFound: true);
         m_PlayerMovement_EquipSword = m_PlayerMovement.FindAction("EquipSword", throwIfNotFound: true);
         m_PlayerMovement_SwitchCameraMode = m_PlayerMovement.FindAction("SwitchCameraMode", throwIfNotFound: true);
+        m_PlayerMovement_Roll = m_PlayerMovement.FindAction("Roll", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -471,6 +492,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerMovement_Slash;
     private readonly InputAction m_PlayerMovement_EquipSword;
     private readonly InputAction m_PlayerMovement_SwitchCameraMode;
+    private readonly InputAction m_PlayerMovement_Roll;
     public struct PlayerMovementActions
     {
         private @PlayerControls m_Wrapper;
@@ -484,6 +506,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Slash => m_Wrapper.m_PlayerMovement_Slash;
         public InputAction @EquipSword => m_Wrapper.m_PlayerMovement_EquipSword;
         public InputAction @SwitchCameraMode => m_Wrapper.m_PlayerMovement_SwitchCameraMode;
+        public InputAction @Roll => m_Wrapper.m_PlayerMovement_Roll;
         public InputActionMap Get() { return m_Wrapper.m_PlayerMovement; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -520,6 +543,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @SwitchCameraMode.started += instance.OnSwitchCameraMode;
             @SwitchCameraMode.performed += instance.OnSwitchCameraMode;
             @SwitchCameraMode.canceled += instance.OnSwitchCameraMode;
+            @Roll.started += instance.OnRoll;
+            @Roll.performed += instance.OnRoll;
+            @Roll.canceled += instance.OnRoll;
         }
 
         private void UnregisterCallbacks(IPlayerMovementActions instance)
@@ -551,6 +577,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @SwitchCameraMode.started -= instance.OnSwitchCameraMode;
             @SwitchCameraMode.performed -= instance.OnSwitchCameraMode;
             @SwitchCameraMode.canceled -= instance.OnSwitchCameraMode;
+            @Roll.started -= instance.OnRoll;
+            @Roll.performed -= instance.OnRoll;
+            @Roll.canceled -= instance.OnRoll;
         }
 
         public void RemoveCallbacks(IPlayerMovementActions instance)
@@ -579,5 +608,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnSlash(InputAction.CallbackContext context);
         void OnEquipSword(InputAction.CallbackContext context);
         void OnSwitchCameraMode(InputAction.CallbackContext context);
+        void OnRoll(InputAction.CallbackContext context);
     }
 }

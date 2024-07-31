@@ -212,6 +212,26 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void RollAction(InputAction.CallbackContext context)
+    {
+        if (grounded && !gettingReadyToJump && isRunning && context.performed) //Allow roll if running / not jumping / grounded
+        {
+            animator.SetTrigger("Roll");
+            StartCoroutine(RollDelay());
+        }
+    }
+
+    private IEnumerator RollDelay()
+    {
+        CanMove = false;
+        CanJump = false;
+        yield return new WaitForSeconds(0.5f);
+        rb.AddForce(transform.forward * 20f, ForceMode.Impulse);
+        yield return new WaitForSeconds(0.5f);
+        CanMove = true;
+        CanJump = true;
+    }
+
     public void JumpAction(InputAction.CallbackContext context)
     {
         if (grounded && !gettingReadyToJump && CanJump)

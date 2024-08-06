@@ -4,40 +4,42 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class PlayerMovement : MonoBehaviour
+public class Player : MonoBehaviour
 {
-    private Rigidbody rb;
+    public Rigidbody rb;
     private Vector2 direction;
     private bool grounded;
-    private Vector3 moveDirection;
-    private float ySpeed;
-    private bool gettingReadyToJump;
-    private bool isEquipping;
+    public Vector3 moveDirection;
+    public float ySpeed;
+    public bool gettingReadyToJump;
+    public bool isEquipping;
     public bool isEquipped;
 
     float velocityZ = 0.0f;
     float velocityX = 0.0f;
 
+    [Header("Movement Variables")]
     public float acceleration = 2.0f;
     public float deceleration = 3.0f;
     public float maximumWalkVelocity = 0.5f;
     public float maximumRunVelocity = 2.0f;
     public float rotationSpeed = 600f;
 
-    //Melee Variables
+    [Header("Melee Variables")]
     public float cooldownTime = 4f;
     public static int noOfClicks = 0;
     private float nextFireTime = 0f;
     float lastClickedTime = 0f;
     float maxComboDelay = 1f;
 
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float runSpeed;
-    [SerializeField] private float groundDrag;
-    [SerializeField] private float airDrag;
-    [SerializeField] private float playerHeight;
-    [SerializeField] private LayerMask isGround;
-    [SerializeField] private Animator animator;
+    [Header("Physics Variable")]
+    public float moveSpeed;
+    public float runSpeed;
+    public float groundDrag;
+    public float airDrag;
+    public float playerHeight;
+    public LayerMask isGround;
+    public Animator animator;
     public int CameraMode = 1;
 
     public GameObject Weapon;
@@ -49,17 +51,34 @@ public class PlayerMovement : MonoBehaviour
     public bool CanMove;
     public bool CanJump;
 
-    private bool isRunning = false;
+    public bool isRunning = false;
+
+    #region State Machine Variables
+    public PlayerStateMachine PlayerStateMachine { get; set; }
+    public PlayerIdleState PlayerIdleState { get; set; }
+    public PlayerJumpState PlayerJumpState { get; set; }
+    #endregion
+
+    private void Awake()
+    {
+        PlayerStateMachine = new PlayerStateMachine();
+
+        PlayerIdleState = new PlayerIdleState(this, PlayerStateMachine);
+        PlayerJumpState = new PlayerJumpState(this, PlayerStateMachine);
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        PlayerStateMachine.Initalize(PlayerIdleState);
     }
 
     // Update is called once per frame
     void Update()
     {
+        PlayerStateMachine.CurrentState.FrameUpdate();
 
         // Reset the combo if the delay is exceeded
         if (Time.time - lastClickedTime > maxComboDelay)
@@ -194,6 +213,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        PlayerStateMachine.CurrentState.PhysicsUpdate();
+
         if (!isRunning)
         {
             rb.AddForce(moveDirection.normalized * moveSpeed, ForceMode.Force);
@@ -236,29 +257,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (grounded && !gettingReadyToJump && CanJump)
         {
-            StartCoroutine(JumpDelay());
+            PlayerStateMachine.ChangeState(PlayerJumpState);
         }
-    }
-
-    private IEnumerator JumpDelay()
-    {
-        CanJump = false;
-        animator.SetTrigger("Jump");
-        isRunning = false;
-        gettingReadyToJump = true;
-        CanMove = false;
-        moveDirection = Vector3.zero;
-        yield return new WaitForSeconds(0.5f);
-        CanMove = true;
-        gettingReadyToJump = false;
-        ySpeed = 20f;
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-        rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
-        animator.SetBool("Landing", false);
-        animator.SetBool("IsFalling", true); // Ensure the falling animation plays
-        animator.ResetTrigger("Jump");
-        yield return new WaitForSeconds(1);
-        CanJump = true;
     }
 
     public void Sprint(InputAction.CallbackContext context)

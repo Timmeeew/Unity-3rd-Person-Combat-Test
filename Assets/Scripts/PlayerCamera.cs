@@ -17,14 +17,14 @@ public class PlayerCamera : MonoBehaviour
     float MouseX;
     float MouseY;
 
-    PlayerMovement MovementScript;
+    Player MovementScript;
 
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        MovementScript = PlayerObj.GetComponent<PlayerMovement>();
+        MovementScript = PlayerObj.GetComponent<Player>();
     }
 
     // Update is called once per frame

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WeaponEquipping : MonoBehaviour
 {
-    public PlayerMovement playerMovement;
+    public Player playerMovement;
     public void Equipped()
     {
         playerMovement.Equipped();

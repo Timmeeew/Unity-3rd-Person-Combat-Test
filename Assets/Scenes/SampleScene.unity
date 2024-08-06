@@ -2338,6 +2338,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe3f5d5cf55e594fb4b750cf04c5972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  moveDirection: {x: 0, y: 0, z: 0}
+  ySpeed: 0
+  gettingReadyToJump: 0
+  isEquipping: 0
   isEquipped: 0
   acceleration: 2
   deceleration: 3
@@ -2363,6 +2368,7 @@ MonoBehaviour:
   maximumFootstepPitch: 1
   CanMove: 1
   CanJump: 1
+  isRunning: 0
 --- !u!82 &1533863074
 AudioSource:
   m_ObjectHideFlags: 0

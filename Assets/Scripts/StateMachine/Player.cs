@@ -6,7 +6,16 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    #region Objects
+    [Header("Objects")]
+    public GameObject Weapon;
+    public GameObject WeaponBack;
+    public Transform cam;
+    public AudioSource footSteps;
     public Rigidbody rb;
+    public Animator animator;
+    #endregion
+
     private Vector2 direction;
     public bool grounded;
     public Vector3 moveDirection;
@@ -18,34 +27,36 @@ public class Player : MonoBehaviour
     float velocityZ = 0.0f;
     float velocityX = 0.0f;
 
+    #region Movement Variables
     [Header("Movement Variables")]
+    public float moveSpeed;
+    public float runSpeed;
     public float acceleration = 2.0f;
     public float deceleration = 3.0f;
     public float maximumWalkVelocity = 0.5f;
     public float maximumRunVelocity = 2.0f;
     public float rotationSpeed = 600f;
+    #endregion
 
+    #region Melee Variables
     [Header("Melee Variables")]
     public float cooldownTime = 4f;
     public static int noOfClicks = 0;
     private float nextFireTime = 0f;
     float lastClickedTime = 0f;
     float maxComboDelay = 1f;
+    #endregion
 
+    #region Physics Variables
     [Header("Physics Variable")]
-    public float moveSpeed;
-    public float runSpeed;
     public float groundDrag;
     public float airDrag;
     public float playerHeight;
+    #endregion
+
     public LayerMask isGround;
-    public Animator animator;
     public int CameraMode = 1;
 
-    public GameObject Weapon;
-    public GameObject WeaponBack;
-    public Transform cam;
-    public AudioSource footSteps;
     public float minimumFootstepPitch = 0.5f;
     public float maximumFootstepPitch = 1f;
     public bool CanMove;
@@ -57,6 +68,7 @@ public class Player : MonoBehaviour
     public PlayerStateMachine PlayerStateMachine { get; set; }
     public PlayerIdleState PlayerIdleState { get; set; }
     public PlayerJumpState PlayerJumpState { get; set; }
+    public PlayerRollingState PlayerRollingState { get; set; }
     #endregion
 
     private void Awake()
@@ -65,6 +77,7 @@ public class Player : MonoBehaviour
 
         PlayerIdleState = new PlayerIdleState(this, PlayerStateMachine);
         PlayerJumpState = new PlayerJumpState(this, PlayerStateMachine);
+        PlayerRollingState = new PlayerRollingState(this, PlayerStateMachine);
     }
 
     // Start is called before the first frame update
@@ -236,27 +249,15 @@ public class Player : MonoBehaviour
 
     public void RollAction(InputAction.CallbackContext context)
     {
-        if (grounded && !gettingReadyToJump && isRunning && context.performed) //Allow roll if running / not jumping / grounded
+        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded && moveDirection != Vector3.zero && isRunning) //Roll if IdleState && grounded && running
         {
-            animator.SetTrigger("Roll");
-            StartCoroutine(RollDelay());
+            PlayerStateMachine.ChangeState(PlayerRollingState);
         }
-    }
-
-    private IEnumerator RollDelay()
-    {
-        CanMove = false;
-        CanJump = false;
-        yield return new WaitForSeconds(0.5f);
-        rb.AddForce(transform.forward * 20f, ForceMode.Impulse);
-        yield return new WaitForSeconds(0.5f);
-        CanMove = true;
-        CanJump = true;
     }
 
     public void JumpAction(InputAction.CallbackContext context)
     {
-        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded) //Jump if IdleState && on ground
+        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded) //Jump if IdleState && grounded
         {
             PlayerStateMachine.ChangeState(PlayerJumpState);
         }
@@ -264,7 +265,7 @@ public class Player : MonoBehaviour
 
     public void Sprint(InputAction.CallbackContext context)
     {
-        if (grounded && !gettingReadyToJump)
+        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded) //Sprint If IdleState && grounded
         {
             isRunning = context.started || context.performed;
         }
@@ -282,6 +283,7 @@ public class Player : MonoBehaviour
         Vector3 forwardRelaive = direction.y * camFoward;
         Vector3 rightRelative = direction.x * camRight;
 
+        //Update moveDirection 
         moveDirection = forwardRelaive + rightRelative;
 
     }

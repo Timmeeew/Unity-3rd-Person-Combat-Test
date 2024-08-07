@@ -16,10 +16,7 @@ public class PlayerJumpState : PlayerState
     public override void EnterState()
     {
         base.EnterState();
-        if (player.grounded)
-        {
-            player.StartCoroutine(JumpDelay()); //Starts the coroutine if grounded
-        }
+        player.StartCoroutine(JumpDelay());
     }
 
     public override void ExitState()
@@ -39,17 +36,22 @@ public class PlayerJumpState : PlayerState
 
     private IEnumerator JumpDelay()
     {
-        player.animator.SetTrigger("Jump");
-        player.isRunning = false;
+        //Start Jumping Animation
+        player.animator.SetTrigger("Jump"); 
+        player.isRunning = false; 
         player.moveDirection = Vector3.zero;
         yield return new WaitForSeconds(0.5f);
         player.ySpeed = 20f;
+        //Add force to Rigidbody
         player.rb.velocity = new Vector3(player.rb.velocity.x, 0f, player.rb.velocity.z);
         player.rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
+        //Update Animator Booleans
         player.animator.SetBool("Landing", false);
-        player.animator.SetBool("IsFalling", true); // Ensure the falling animation plays
+        // Ensure the falling animation plays
+        player.animator.SetBool("IsFalling", true); 
         player.animator.ResetTrigger("Jump");
-        yield return new WaitForSeconds(1);
-        player.PlayerStateMachine.ChangeState(player.PlayerIdleState); // Transition back to Idle state
+        yield return new WaitForSeconds(1f);
+        // Transition back to Idle state
+        player.PlayerStateMachine.ChangeState(player.PlayerIdleState); 
     }
 }

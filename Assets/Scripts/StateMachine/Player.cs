@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
 {
     public Rigidbody rb;
     private Vector2 direction;
-    private bool grounded;
+    public bool grounded;
     public Vector3 moveDirection;
     public float ySpeed;
     public bool gettingReadyToJump;
@@ -131,7 +131,7 @@ public class Player : MonoBehaviour
 
     public void Equip(InputAction.CallbackContext context)
     {
-        if (!gettingReadyToJump && grounded &&  context.performed)
+        if (!gettingReadyToJump && grounded && context.performed)
         {
             if (!isEquipped) //Equip
             {
@@ -215,22 +215,23 @@ public class Player : MonoBehaviour
     {
         PlayerStateMachine.CurrentState.PhysicsUpdate();
 
-        if (!isRunning)
+        if (!grounded || PlayerStateMachine.CurrentState == PlayerIdleState)
         {
-            rb.AddForce(moveDirection.normalized * moveSpeed, ForceMode.Force);
+            if (!isRunning)
+            {
+                rb.AddForce(moveDirection.normalized * moveSpeed, ForceMode.Force);
+            }
+            else
+            {
+                rb.AddForce(moveDirection.normalized * runSpeed, ForceMode.Force);
+            }
         }
-        else
-        {
-            rb.AddForce(moveDirection.normalized * runSpeed, ForceMode.Force);
-        }
+        
     }
 
     public void MoveAction(InputAction.CallbackContext context)
     {
-        if (CanMove) //Only updates direction if player can move
-        {
-            direction = context.ReadValue<Vector2>();
-        }
+        direction = context.ReadValue<Vector2>(); //Update Vector2 Direction
     }
 
     public void RollAction(InputAction.CallbackContext context)
@@ -255,7 +256,7 @@ public class Player : MonoBehaviour
 
     public void JumpAction(InputAction.CallbackContext context)
     {
-        if (grounded && !gettingReadyToJump && CanJump)
+        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded) //Jump if IdleState && on ground
         {
             PlayerStateMachine.ChangeState(PlayerJumpState);
         }
@@ -281,11 +282,8 @@ public class Player : MonoBehaviour
         Vector3 forwardRelaive = direction.y * camFoward;
         Vector3 rightRelative = direction.x * camRight;
 
-        if (CanMove)
-        {
-            moveDirection = forwardRelaive + rightRelative;
-        }
-      
+        moveDirection = forwardRelaive + rightRelative;
+
     }
 
     public void SwitchCameraMode(InputAction.CallbackContext context)

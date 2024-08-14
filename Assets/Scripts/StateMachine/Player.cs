@@ -144,14 +144,16 @@ public class Player : MonoBehaviour
 
     public void Equip(InputAction.CallbackContext context)
     {
-        if (!gettingReadyToJump && grounded && context.performed)
+        if (!gettingReadyToJump && grounded && context.performed && PlayerStateMachine.CurrentState == PlayerIdleState)
         {
-            if (!isEquipped) //Equip
+            //Equip
+            if (!isEquipped) 
             {
                 isEquipping = true;
                 animator.SetTrigger("Equip");
             }
-            else if (isEquipped) //Unequip
+            //Unequip
+            else if (isEquipped) 
             {
                 isEquipping = true;
                 animator.SetTrigger("Unequip");
@@ -205,8 +207,10 @@ public class Player : MonoBehaviour
                 animator.SetBool("Slash3", true);
                 animator.SetBool("Slash2", false);
                 animator.SetBool("Slash1", false);
-                noOfClicks = 0;  // Reset the combo after the final hit
-                nextFireTime = Time.time + cooldownTime;// Start cooldown after the combo
+                // Reset the combo after the final hit
+                noOfClicks = 0;
+                // Start cooldown after the combo
+                nextFireTime = Time.time + cooldownTime;
                 Debug.Log(nextFireTime);
             }
 
@@ -247,9 +251,22 @@ public class Player : MonoBehaviour
         direction = context.ReadValue<Vector2>(); //Update Vector2 Direction
     }
 
+    public bool CanRollCollisionCheck()
+    {
+        RaycastHit hit;
+        // Does the ray intersect any objects excluding the player layer
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward) * 5f, out hit, Mathf.Infinity, isGround)) 
+        {
+            Debug.Log("Did Hit");
+            return false;
+        }
+        return true;
+    }
+
     public void RollAction(InputAction.CallbackContext context)
     {
-        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded && moveDirection != Vector3.zero && isRunning) //Roll if IdleState && grounded && running
+        if (!context.performed) return;
+        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded && moveDirection != Vector3.zero && isRunning && CanRollCollisionCheck()) //Roll if IdleState && grounded && running
         {
             PlayerStateMachine.ChangeState(PlayerRollingState);
         }
@@ -257,7 +274,7 @@ public class Player : MonoBehaviour
 
     public void JumpAction(InputAction.CallbackContext context)
     {
-        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded) //Jump if IdleState && grounded
+        if (PlayerStateMachine.CurrentState == PlayerIdleState && grounded && context.performed) //Jump if IdleState && grounded
         {
             PlayerStateMachine.ChangeState(PlayerJumpState);
         }
@@ -303,7 +320,8 @@ public class Player : MonoBehaviour
         }
     }
 
-    private bool CanStrafe()
+    //Function that returns true if cameramode == 2
+    private bool CanStrafe() 
     {
         return CameraMode == 2;
     }

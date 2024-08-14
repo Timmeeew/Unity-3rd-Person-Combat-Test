@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class PlayerIdleState : PlayerState
 {
+    private Player player;
     public PlayerIdleState(Player player, PlayerStateMachine stateMachine) : base(player, stateMachine)
     {
+        this.player = player;
     }
 
     public override void EnterState()

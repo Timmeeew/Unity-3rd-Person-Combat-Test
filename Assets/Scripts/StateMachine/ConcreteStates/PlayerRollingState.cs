@@ -34,8 +34,9 @@ public class PlayerRollingState : PlayerState
 
     private IEnumerator RollDelay()
     {
-        player.isRunning = false;
+        //Set roll trigger
         player.animator.SetTrigger("Roll");
+        //Apply a foce foward
         player.rb.AddForce(player.transform.forward * 100f, ForceMode.Impulse);
         yield return new WaitForSeconds(0.5f);
         player.PlayerStateMachine.ChangeState(player.PlayerIdleState);
